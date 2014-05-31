@@ -5,12 +5,22 @@
 var socket = io();
  
 function startDanceParty(){
-    socket.emit('client message', 'start');
+    console.log('starting dance party');
+    socket.emit('new message', {song: 'asdf'});
     return false;
+}
+
+function dancePartyTime() {
+    socket.on('somebody started', function(data) {
+        console.log('somebody started');
+        console.log(data.userid);
+        console.log(data.message);
+    })
 }
  
 function addEventHandlers(){
-    $('#danceParty').submit(startDanceParty);
+    dancePartyTime();
+    $('#danceParty').click(startDanceParty);
 }
  
 $(document).ready(function(){
