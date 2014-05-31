@@ -4,6 +4,10 @@
  */
 var socket = io();
 var isReady = false;
+var soundBuffer = null;
+window.AudioContext = window.AudioContext || window.webkitAudioContext;
+var context = new AudioContext();
+var ctxSource;
 
 var guid = (function() {
   function s4() {
@@ -17,7 +21,7 @@ var guid = (function() {
   };
 })();
 
-var id = guid();
+var id;
 var currentPartyId;
  
 function startDanceParty(){
@@ -32,6 +36,9 @@ function setPartyStarting(data){
     $('#danceParty').val('Party Starting...');
     $('#danceParty').attr('disabled','disabled');
     prepDanceParty(data);
+    ctxSource = context.createBufferSource(); // creates a sound source
+    ctxSource.buffer = soundBuffer;                    // tell the source which sound to play
+    ctxSource.connect(context.destination);       // connect the source to the context's destination (the speakers)
 }
 
 function joinDanceParty(pid){
@@ -55,6 +62,8 @@ function prepDanceParty(data){
 
 // Dance off NOW!
 function danceOff(data){
+    ctxSource.start(0);                           // play the source now
+                                             
     $('#danceParty').val('DANCE PARTY');
     $("body").prepend('<img src="http://media2.giphy.com/media/kgKrO1A3JbWTK/giphy.gif" />');
 }
@@ -88,6 +97,7 @@ function dancePartyTime() {
     socket.on('party ended', function(data) {
         console.log('a party just ended');
         $('body img:first').remove();
+        ctxSource.stop(0);
         resetState();
     });
 }
@@ -96,11 +106,47 @@ function addEventHandlers(){
     dancePartyTime();
     $('#danceParty').unbind('click').click(startDanceParty);
 }
+
+function getId(){
+    if ( typeof(Storage) !== 'undefined' ){
+        var localItem = localStorage.getItem('id');
+        if ( localItem !== null ){
+            id = localItem;
+        } else {
+            id = guid();
+            localStorage.setItem('id', id); // comment this out to create unique users every time
+        }
+    } else {
+        id = guid();
+    }
+}
+ 
+function loadAudio(url) {
+    var request = new XMLHttpRequest();
+    request.open('GET', url, true);
+    request.responseType = 'arraybuffer';
+    
+    var callback = function() {
+        context.decodeAudioData(request.response, function(buffer) {
+            soundBuffer = buffer;
+        });
+    };
+    
+    // Decode asynchronously
+    if ( typeof request.addEventListener !== 'undefined' ) {
+        request.addEventListener('load', callback, false);
+    } else if ( typeof request.onload !== 'undefined' ) {
+        request.onload = callback;
+    }
+    request.send();
+}
  
 $(document).ready( function(){
     if ( isReady === false ) {
         addEventHandlers();
         resetState();
+        getId();
+        loadAudio('dancesong3.mp3');
         isReady = true;
     }
 });

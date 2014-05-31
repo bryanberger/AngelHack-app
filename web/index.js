@@ -10,7 +10,7 @@ var port = 3000;
 var flatDB;
 var flatDBName = 'db.json';
 var startTimer = 5000; // 5 seconds until a dance starts
-var danceTime = 10000;
+var danceTime = 30000;
 var endTimer = startTimer + danceTime; // 20 second dance parties
 
 var guid = (function() {
@@ -30,7 +30,7 @@ function initDB(){
         var db;
         console.log('Reading the database file');
         if(err)
-            return console.log('No database has been created');
+            console.log('No database has been created');
         try {
             flatDB = JSON.parse(data.toString('utf-8'));
         } catch ( e ) {
@@ -38,6 +38,7 @@ function initDB(){
             flatDB = JSON.parse('{"archive":{}}');
         }
         flatDB.activeParty = undefined; // always empty out our active party
+        updateDB();
     });
 }
 
@@ -82,7 +83,7 @@ function finishParty(socket, partyId){
     updateDB();
     socket.emit('party ended', {partyId: flatDB.activeParty.id});
     socket.broadcast.emit('party ended', {partyId: flatDB.activeParty.id});
-    flatDB.activeParty = undefined; // always empty out our active party
+    flatDB.activeParty = undefined;
     updateDB();
 }
 
