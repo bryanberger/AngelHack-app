@@ -115,8 +115,8 @@ function createNewParty(userId, socket){
     });
     
     // Send to our creator that this party was started
-    socket.emit('party accepted', {'partyId':flatDB.activeParty.id});
-    
+    socket.broadcast.emit('party accepted', {'userId':flatDB.userInitiated, 'partyId':flatDB.activeParty.id});
+   
     // Start emitting there is a party
     partyCountdown(socket);
     

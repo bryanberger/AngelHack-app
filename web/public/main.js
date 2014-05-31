@@ -21,7 +21,8 @@ var currentPartyId;
  
 function startDanceParty(){
     console.log('starting dance party');
-    socket.emit('new party', {userId: id});
+    var dataBuffer = {userId: id};
+    socket.emit('new party', dataBuffer);
     return false;
 }
 
@@ -39,8 +40,12 @@ function joinDanceParty(pid){
 
 function dancePartyTime() {    
     socket.on('party accepted', function(data) {
-        console.log('Our party was accepted');
-        setPartyStarting(data.partyId);
+        if ( id === data.userId ) {
+            console.log('Our party was accepted');
+            setPartyStarting(data.partyId);
+        } else {
+            console.log('Someone elses party was accepted');
+        }
     });
     
     socket.on('party starting', function(data) {
