@@ -11,10 +11,14 @@ server.listen(port, function(){
 app.use(express.static(__dirname + '/public'));
 
 io.on('connection', function(socket) {
-    socket.on('new message', function(Data){
-        socket.broadcast.emit('new message', {
+    socket.on('new message', function(data){
+        socket.broadcast.emit('somebody started', {
             userid: 'user0001',
             message: 'test'
         });
     });
+
+
+
+
 });
