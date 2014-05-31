@@ -57,12 +57,14 @@ function setDBValue(key, value){
 function partyCountdown(socket){
     var callback = function(){
         console.log('Emit that we are starting a party');
-        socket.broadcast.emit('party starting', {
+        var dataPacket = {
             id:  flatDB.activeParty.id,
             startDate : flatDB.activeParty.startDate,
             endDate : flatDB.activeParty.endDate,
             userCnt : flatDB.activeParty.userList.length
-        });
+        };
+        socket.emit('party starting', dataPacket);
+        socket.broadcast.emit('party starting', dataPacket);
         if ( flatDB.activeParty.startDate > Date.now() ) {
             setTimeout(callback, 100);
         } else {
@@ -71,7 +73,7 @@ function partyCountdown(socket){
             setTimeout(function(){finishParty(socket, flatDB.activeParty.id)}, 200000); // tell our clients this party is done
         }
     };    
-    setTimeout(callback, 100);
+    setTimeout(callback, 1000);
 }
 
 // Go through our list of users, tell them its all done
@@ -115,7 +117,7 @@ function createNewParty(userId, socket){
     });
     
     // Send to our creator that this party was started
-    socket.broadcast.emit('party accepted', {'userId':flatDB.userInitiated, 'partyId':flatDB.activeParty.id});
+    socket.emit('party accepted', {userId:flatDB.userInitiated, partyId:flatDB.activeParty.id});
    
     // Start emitting there is a party
     partyCountdown(socket);
@@ -132,19 +134,21 @@ app.use(express.static(__dirname + '/public'));
 
 io.on('connection', function(socket) {
     socket.on('new party', function(Data){
-        if ( createNewParty(Data.userId, socket) ){
+        var dataObj = JSON.parse(Data);
+        if ( createNewParty(dataObj.userId, socket) ){
             console.log('Party started!');
         } else {
-            console.log('User ' + Data.userId + ' could not start a party!');
+            console.log('User ' + dataObj.userId + ' could not start a party!');
         }
     });
     
     socket.on('join party', function(Data){
-        console.log('User wants to join party ' + Data.userId + ' : ' + Data.partyId);
-        if ( addToParty(Data.partyId, Data.userId) ){
-            console.log('User ' + Data.userId + ' added to party ' + Data.partyId);
+        var dataObj = JSON.parse(Data);
+        console.log('User wants to join party ' + dataObj.userId + ' : ' + dataObj.partyId);
+        if ( addToParty(dataObj.partyId, dataObj.userId) ){
+            console.log('User ' + dataObj.userId + ' added to party ' + dataObj.partyId);
         } else {
-            console.log('User ' + Data.userId + ' could not be added to party ' + Data.partyId);
+            console.log('User ' + dataObj.userId + ' could not be added to party ' + dataObj.partyId);
         }
     });
 });
