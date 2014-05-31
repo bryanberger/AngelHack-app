@@ -3,6 +3,7 @@
  *  Main Javascript file.
  */
 var socket = io();
+var isReady = false;
 
 var guid = (function() {
   function s4() {
@@ -26,23 +27,45 @@ function startDanceParty(){
     return false;
 }
 
-function setPartyStarting(partyId){
-    currentPartyId = partyId;
+function setPartyStarting(data){
+    currentPartyId = data.partyId;
     $('#danceParty').val('Party Starting...');
     $('#danceParty').attr('disabled','disabled');
+    prepDanceParty(data);
 }
 
 function joinDanceParty(pid){
     // Clients don't care if they fail
     socket.emit('join party', JSON.stringify({userId: id, partyId: pid}));
-    setPartyStarting(pid);
+}
+
+function prepDanceParty(data){
+    var startDate = data.startDate;
+    // set an interval that spirals closer to the closing time
+    var callback = function(){
+        if ( Date.now() >= data.startDate ) {
+            // Fucking dance off
+            danceOff(data);
+        } else {
+            setTimeout(callback, 10);
+        }
+    };
+    callback();
+}
+
+// Dance off NOW!
+function danceOff(data){
+    console.log('DAAAAAAAAAAAAAAAAANCE');
+    $("body").prepend('<img src="http://media2.giphy.com/media/kgKrO1A3JbWTK/giphy.gif" />');
+    $('#danceParty').val('DANCE PARTY');
 }
 
 function dancePartyTime() {    
     socket.on('party accepted', function(data) {
-        if ( id === data.userId ) {
+        var dataObj = JSON.parse(data);
+        if ( id === dataObj.userId ) {
             console.log('Our party was accepted');
-            setPartyStarting(data.partyId);
+            setPartyStarting(dataObj);
         } else {
             console.log('Someone elses party was accepted');
         }
@@ -52,7 +75,7 @@ function dancePartyTime() {
         console.log('a party is about to start');
         if ( data.partyId !== currentPartyId ) {
             $('#danceParty').val('Join Party');
-            $('#danceParty').click(function(){joinDanceParty(data.partyId)});
+            $('#danceParty').unbind('click').click(function(){joinDanceParty(data.partyId)});
         }
     });
     
@@ -60,15 +83,18 @@ function dancePartyTime() {
         console.log('a party just ended');
         currentPartyId = data.partyId;
         $('#danceParty').val('Start party');
-        $('#danceParty').click(startDanceParty);
+        $('#danceParty').unbind('click').click(startDanceParty);
     });
 }
  
 function addEventHandlers(){
     dancePartyTime();
-    $('#danceParty').click(startDanceParty);
+    $('#danceParty').unbind('click').click(startDanceParty);
 }
  
-$(document).ready(function(){
-    addEventHandlers();
+$(document).ready( function(){
+    if ( isReady === false ) {
+        addEventHandlers();
+        isReady = true;
+    }
 });
