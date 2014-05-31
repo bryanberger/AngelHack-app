@@ -17,6 +17,7 @@ var guid = (function() {
 })();
 
 var id = guid();
+var currentPartyId;
  
 function startDanceParty(){
     console.log('starting dance party');
@@ -24,27 +25,37 @@ function startDanceParty(){
     return false;
 }
 
-function joinDanceParty(){
-    socket.emit('join party', {userId: id, partyId: 'test'});
+function setPartyStarting(partyId){
+    currentPartyId = partyId;
+    $('#danceParty').val('Party Starting...');
+    $('#danceParty').attr('disabled','disabled');
 }
 
-function dancePartyTime() {
-    socket.on('somebody started', function(data) {
-        console.log('somebody started');
-        console.log(data.userid);
-        console.log(data.message);
+function joinDanceParty(pid){
+    // Clients don't care if they fail
+    socket.emit('join party', {userId: id, partyId: pid});
+    setPartyStarting(pid);
+}
+
+function dancePartyTime() {    
+    socket.on('party accepted', function(data) {
+        console.log('Our party was accepted');
+        setPartyStarting(data.partyId);
     });
     
     socket.on('party starting', function(data) {
         console.log('a party is about to start');
-        $('#danceParty').attr('id',data.partyId);
-        $('#danceParty').val('Join Party');
+        if ( data.partyId !== currentPartyId ) {
+            $('#danceParty').val('Join Party');
+            $('#danceParty').click(function(){joinDanceParty(data.partyId)});
+        }
     });
     
     socket.on('party ended', function(data) {
         console.log('a party just ended');
-        $('#danceParty').attr('id','');
+        currentPartyId = data.partyId;
         $('#danceParty').val('Start party');
+        $('#danceParty').click(startDanceParty);
     });
 }
  
