@@ -55,8 +55,8 @@ function partyCountdown(){
         socket.broadcast.emit('party starting', {
             id:  flatDB.activeParty.id,
             startDate : flatDB.activeParty.startDate,
-            endDate : flatDB.activeParty.endDate
-            userCnt : flatDB.activeParty.userList.length()
+            endDate : flatDB.activeParty.endDate,
+            userCnt : flatDB.activeParty.userList.length
         });
     };    
     setTimeout(callback, 100);
@@ -94,7 +94,7 @@ function createNewParty(userId){
      
     // Create a fucking party
     setDBValue('activeParty',{
-        id:  guti();,
+        id:  guti(),
         userInitiated : userId,
         initDate : Date.now(),
         startDate : Date.now() + 50000,
