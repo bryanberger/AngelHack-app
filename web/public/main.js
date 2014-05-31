@@ -22,7 +22,7 @@ var currentPartyId;
 function startDanceParty(){
     console.log('starting dance party');
     var dataBuffer = {userId: id};
-    socket.emit('new party', dataBuffer);
+    socket.emit('new party', JSON.stringify(dataBuffer));
     return false;
 }
 
@@ -34,7 +34,7 @@ function setPartyStarting(partyId){
 
 function joinDanceParty(pid){
     // Clients don't care if they fail
-    socket.emit('join party', {userId: id, partyId: pid});
+    socket.emit('join party', JSON.stringify({userId: id, partyId: pid}));
     setPartyStarting(pid);
 }
 
