@@ -33,7 +33,11 @@ function initDB(){
             flatDB = JSON.parse(data.toString('utf-8'));
         } catch ( e ) {
             return console.log('Corrupted database');
-        }   
+        }
+        
+        // just for now, clear it out. DONT do this in production
+        flatDB = JSON.parse('{}');
+        updateDB();
     });
 }
 
@@ -52,18 +56,26 @@ function setDBValue(key, value){
 
 function partyCountdown(socket){
     var callback = function(){
+        console.log('Emit that we are starting a party');
         socket.broadcast.emit('party starting', {
             id:  flatDB.activeParty.id,
             startDate : flatDB.activeParty.startDate,
             endDate : flatDB.activeParty.endDate,
             userCnt : flatDB.activeParty.userList.length
         });
+        if ( flatDB.activeParty.startDate > Date.now() ) {
+            setTimeout(callback, 100);
+        } else {
+            // Party started!!!!!
+            console.log('In 20 seconds, emit that our party is over');
+            setTimeout(function(){finishParty(socket, flatDB.activeParty.id)}, 200000); // tell our clients this party is done
+        }
     };    
     setTimeout(callback, 100);
 }
 
 // Go through our list of users, tell them its all done
-function finishParty(partyId){
+function finishParty(socket, partyId){
     socket.broadcast.emit('party ended', {
         id: flatDB.activeParty.id
     });
@@ -73,7 +85,7 @@ function addToParty(partyId, userId, socket){
     console.log('User ' + userId + ' wants to join ' + partyId);
     if ( typeof flatDB.activeParty !== 'undefined' &&
          flatDB.activeParty.id == partyId &&
-         !flatDB.activeParty.userList.contains(userId) ) {
+         !flatDB.activeParty.userList.indexOf(userId) ) {
         console.log('User ' + userid + ' added to ' + partyId);
         flatDB.activeParty.userList.push(userId);
         updateDB();
@@ -83,7 +95,7 @@ function addToParty(partyId, userId, socket){
 
 function createNewParty(userId, socket){
     // check to see if this user is currently in an active party
-    if ( typeof flatDB.activeParty !== 'undefined' && flatDB.activeParty.userList.contains(userId) ) {
+    if ( typeof flatDB.activeParty !== 'undefined' && flatDB.activeParty.userList.indexOf(userId) ) {
         // User is currently already in the active party list, do not let them start a new party
         return false;
     } else if ( typeof flatDB.activeParty !== 'undefined' && 
@@ -120,11 +132,16 @@ io.on('connection', function(socket) {
         if ( createNewParty(Data.userId, socket) ){
             console.log('Party started!');
         } else {
-            console.log('Could not start a party!');
+            console.log('User ' + Data.userId + ' could not start a party!');
         }
     });
     
     socket.on('join party', function(Data){
         console.log('User wants to join party ' + Data.userId + ' : ' + Data.partyId);
+        if ( addToParty(Data.partyId, Data.userId) ){
+            console.log('User ' + Data.userId + ' added to party ' + Data.partyId);
+        } else {
+            console.log('User ' + Data.userId + ' could not be added to party ' + Data.partyId);
+        }
     });
 });

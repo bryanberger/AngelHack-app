@@ -37,10 +37,14 @@ function dancePartyTime() {
     
     socket.on('party starting', function(data) {
         console.log('a party is about to start');
+        $('#danceParty').attr('id',data.partyId);
+        $('#danceParty').val('Join Party');
     });
     
     socket.on('party ended', function(data) {
         console.log('a party just ended');
+        $('#danceParty').attr('id','');
+        $('#danceParty').val('Start party');
     });
 }
  
