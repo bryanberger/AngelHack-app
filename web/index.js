@@ -10,7 +10,7 @@ var port = 3000;
 var flatDB;
 var flatDBName = 'db.json';
 var startTimer = 5000; // 5 seconds until a dance starts
-var danceTime = 20000;
+var danceTime = 10000;
 var endTimer = startTimer + danceTime; // 20 second dance parties
 
 var guid = (function() {
@@ -31,17 +31,13 @@ function initDB(){
         console.log('Reading the database file');
         if(err)
             return console.log('No database has been created');
-        console.log(data.toString('utf-8'));
         try {
             flatDB = JSON.parse(data.toString('utf-8'));
         } catch ( e ) {
             console.log('Corrupted database, rebuilding');
-            flatDB = JSON.parse('{}');
+            flatDB = JSON.parse('{"archive":{}}');
         }
-        
-        // just for now, clear it out. DONT do this in production
-        flatDB = JSON.parse('{}');
-        updateDB();
+        flatDB.activeParty = undefined; // always empty out our active party
     });
 }
 
@@ -60,7 +56,6 @@ function setDBValue(key, value){
 
 function partyCountdown(socket){
     var callback = function(){
-        console.log('Emit that we are starting a party');
         var dataPacket = {
             partyId:  flatDB.activeParty.id,
             startDate : flatDB.activeParty.startDate,
@@ -73,8 +68,7 @@ function partyCountdown(socket){
             setTimeout(callback, 100);
         } else {
             // Party started!!!!!
-            console.log('In 20 seconds, emit that our party is over');
-            setTimeout(function(){finishParty(socket, flatDB.activeParty.id)}, danceTime); // tell our clients this party is done
+            setTimeout(function(){finishParty(socket)}, danceTime); // tell our clients this party is done
         }
     };    
     callback();
@@ -82,9 +76,14 @@ function partyCountdown(socket){
 
 // Go through our list of users, tell them its all done
 function finishParty(socket, partyId){
-    socket.broadcast.emit('party ended', {
-        id: flatDB.activeParty.id
-    });
+    console.log('Ending the party ' + flatDB.activeParty.id + ', archiving');
+    // Save our database, archive the current party
+    flatDB.archive[flatDB.activeParty.id.toString()] = flatDB.activeParty;
+    updateDB();
+    socket.emit('party ended', {partyId: flatDB.activeParty.id});
+    socket.broadcast.emit('party ended', {partyId: flatDB.activeParty.id});
+    flatDB.activeParty = undefined; // always empty out our active party
+    updateDB();
 }
 
 function addToParty(pid, uid, socket){

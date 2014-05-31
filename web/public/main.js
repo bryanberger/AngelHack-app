@@ -55,9 +55,15 @@ function prepDanceParty(data){
 
 // Dance off NOW!
 function danceOff(data){
-    console.log('DAAAAAAAAAAAAAAAAANCE');
-    $("body").prepend('<img src="http://media2.giphy.com/media/kgKrO1A3JbWTK/giphy.gif" />');
     $('#danceParty').val('DANCE PARTY');
+    $("body").prepend('<img src="http://media2.giphy.com/media/kgKrO1A3JbWTK/giphy.gif" />');
+}
+
+// Reset our current state
+function resetState(){
+    $('#danceParty').val('Start Party');
+    $('#danceParty').unbind('click').click(startDanceParty);
+    $('#danceParty').removeAttr('disabled');
 }
 
 function dancePartyTime() {    
@@ -74,16 +80,15 @@ function dancePartyTime() {
     socket.on('party starting', function(data) {
         console.log('a party is about to start');
         if ( data.partyId !== currentPartyId ) {
-            $('#danceParty').val('Join Party');
+            $('#danceParty').val('Join Party - ' + data.userCnt + ' Partiers');
             $('#danceParty').unbind('click').click(function(){joinDanceParty(data.partyId)});
         }
     });
     
     socket.on('party ended', function(data) {
         console.log('a party just ended');
-        currentPartyId = data.partyId;
-        $('#danceParty').val('Start party');
-        $('#danceParty').unbind('click').click(startDanceParty);
+        $('body img:first').remove();
+        resetState();
     });
 }
  
@@ -95,6 +100,7 @@ function addEventHandlers(){
 $(document).ready( function(){
     if ( isReady === false ) {
         addEventHandlers();
+        resetState();
         isReady = true;
     }
 });
