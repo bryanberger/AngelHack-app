@@ -10,7 +10,7 @@ var port = 3000;
 var flatDB;
 var flatDBName = 'db.json';
 
-function guid() {
+var guid = (function() {
   function s4() {
     return Math.floor((1 + Math.random()) * 0x10000)
                .toString(16)
@@ -20,7 +20,7 @@ function guid() {
     return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
            s4() + '-' + s4() + s4() + s4();
   };
-}
+})();
 
 function initDB(){
     fs.readFile(flatDBName, function(err,data) {
@@ -50,7 +50,7 @@ function setDBValue(key, value){
     updateDB();
 }
 
-function partyCountdown(){
+function partyCountdown(socket){
     var callback = function(){
         socket.broadcast.emit('party starting', {
             id:  flatDB.activeParty.id,
@@ -81,7 +81,7 @@ function addToParty(partyId, userId, socket){
     }
 }
 
-function createNewParty(userId){
+function createNewParty(userId, socket){
     // check to see if this user is currently in an active party
     if ( typeof flatDB.activeParty !== 'undefined' && flatDB.activeParty.userList.contains(userId) ) {
         // User is currently already in the active party list, do not let them start a new party
@@ -94,7 +94,7 @@ function createNewParty(userId){
      
     // Create a fucking party
     setDBValue('activeParty',{
-        id:  guti(),
+        id:  guid(),
         userInitiated : userId,
         initDate : Date.now(),
         startDate : Date.now() + 50000,
@@ -103,7 +103,7 @@ function createNewParty(userId){
     });
     
     // Start emitting there is a party
-    partyCountdown();
+    partyCountdown(socket);
     
     return true
 }
@@ -116,24 +116,15 @@ server.listen(port, function(){
 app.use(express.static(__dirname + '/public'));
 
 io.on('connection', function(socket) {
-    socket.on('new message', function(Data){
-        socket.broadcast.emit('new message', {
-            userid: 'user0001',
-            message: 'test'
-        });
-    });
-    
     socket.on('new party', function(Data){
-        if ( createNewParty(userId) ){
-            socket.broadcast.emit('new party', {
-                partyid: 'party1',
-                timeStart: '1515151515',
-                timeEnd: '1515151515'
-            });
+        if ( createNewParty(Data.userId, socket) ){
+            console.log('Party started!');
+        } else {
+            console.log('Could not start a party!');
         }
     });
     
-    socket.on('poll party', function(Data){
-        
+    socket.on('join party', function(Data){
+        console.log('User wants to join party ' + Data.userId + ' : ' + Data.partyId);
     });
 });
