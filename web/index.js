@@ -37,6 +37,9 @@ function initDB(){
             console.log('Corrupted database, rebuilding');
             flatDB = JSON.parse('{"archive":{}}');
         }
+		if ( typeof flatDB.archive === 'undefined' ){
+			flatDB.archive = {};
+		}
         flatDB.activeParty = undefined; // always empty out our active party
         updateDB();
     });
