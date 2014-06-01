@@ -9,13 +9,14 @@ var port = 3000;
 // Local variables
 var flatDB;
 var flatDBName = 'db.json';
-var startTimer = 5000; // 5 seconds until a dance starts
-var danceTime = 10000;
+var startTimer = 30*1000; // 30 seconds until a dance starts
+var danceTime = 30*1000; // dance parties are 30 seconds long
 var endTimer = startTimer + danceTime; // 20 second dance parties
 var songFiles = {
 	'80s':'dancesong1.mp3',
 	'electro':'dancesong2.mp3',
-	'house':'dancesong3.mp3'
+	'house':'dancesong3.mp3',
+	'pop':'dancesong4.mp3'
 };
 
 var guid = (function() {
@@ -70,6 +71,10 @@ function partyCountdown(socket){
 		}
         var dataPacket = {
             partyId : flatDB.activeParty.id,
+			partyName : flatDB.activeParty.partyName,
+			partyDescription : flatDB.activeParty.partyDescription,
+			timeLeft : flatDB.activeParty.startDate - Date.now(),
+			timeExpires : flatDB.activeParty.endDate - Date.now(),
             userCnt : flatDB.activeParty.userList.length
         };
         socket.emit('party starting', dataPacket);

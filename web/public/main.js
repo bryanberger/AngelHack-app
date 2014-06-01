@@ -10,16 +10,19 @@ var context = new AudioContext();
 var ctxSource;
 var danceOffNow = false;
 var currentPartyId;
-var newPartyId;
+var listPartyId;
+var listExpires;
 var partyReady = false;
 var partyGifs = ['http://static.fjcdn.com/gifs/Praise_f5e992_796049.gif',
 				'http://media2.giphy.com/media/kgKrO1A3JbWTK/giphy.gif',
-				'http://mashable.com/wp-content/uploads/2013/06/Party-GIF.gif',
 				'http://media2.giphy.com/media/hsBZfDG7wiWHu/giphy.gif',
 				'http://college-social.com/content/uploads/sites/7/2014/03/jimmyelmo_its_a_gif_party-s480x270-142843-580.gif',
 				'http://static.fjcdn.com/gifs/PARTY_6f9750_2098765.gif',
 				'http://31.media.tumblr.com/c99133aa872ca545945d804a5d2a0216/tumblr_mglmrjTf2E1rusugho1_500.gif',
-				'http://media.giphy.com/media/wtVljL9rUURW0/giphy.gif'];
+				'http://media.giphy.com/media/wtVljL9rUURW0/giphy.gif',
+				'http://img2.wikia.nocookie.net/__cb20131123181002/adventuretimewithfinnandjake/images/9/9c/Party_hard_pug.gif',
+				'http://partyhard.me/gifs/dancing-man-party-hard-gif.gif',
+				'http://www.lucidchan.org/ph/src/129832260942.gif'];
 var id;
 var partyTimerId = -1;
 var songReady = false;
@@ -39,7 +42,7 @@ var guid = (function() {
 function startDanceParty(){
     console.log('starting dance party');
 
-	var callback = function(geoPos){	
+	//var callback = function(geoPos){	
 		var dataBuffer = {
 			userId: id,
 			songId: $('select#genre option:selected').val(),
@@ -49,9 +52,10 @@ function startDanceParty(){
 		};
 		socket.emit('new party', JSON.stringify(dataBuffer));
 		unlockAudio();
-	};
+	//};
 
-	//determine if the handset has client side geo location capabilities
+	/*
+	determine if the handset has client side geo location capabilities
 	if(geo_position_js.init()){
 	   geo_position_js.getCurrentPosition(callback, callback);
 	}
@@ -59,7 +63,7 @@ function startDanceParty(){
 	   console.log('Could not connect to geo');
 	   callback();
 	}
-
+	*/
     return false;
 }
 
@@ -121,6 +125,7 @@ function resetState(){
 	partyReady = false;
 	danceOffNow = false;
 	songReady = false;
+	$('ul.party-list').hide(); // hide our list of items
 }
 
 // Button events
@@ -129,15 +134,7 @@ function partyButtonClick(){
 }
 
 function joinButtonClick(){
-	var callback = function(){
-		if ( partyReady === true ) {
-			joinDanceParty(newPartyId);
-		} else {
-			$('div.timerUpdate').text('Waiting for party....');
-			partyTimerId = setTimeout(callback, 250);
-		}
-	};
-	callback();
+	joinDanceParty(listPartyId);
 }
 
 // Check to see if we are in the middle of a dance party
@@ -162,14 +159,22 @@ function dancePartyTime() {
         }
     });
     
+	// Add this to our join list if its not already there
     socket.on('party starting', function(data) {
         console.log('a party is about to start');
         if ( data.partyId !== currentPartyId &&
-				data.partyId !== newPartyId ) {
-            newPartyId = data.partyId;
-			partyReady = true;
+				data.partyId !== listPartyId ) {
+            listPartyId = data.partyId;
+			listExpires = data.timeExpires; // how long until this expires?
+			$('p.list-item-title').each(function(){$(this).text(data.partyName);});
+			$('p.list-item-subtitle').each(function(){$(this).text(data.partyDescription);});
+			if ( data.timeLeft > 60000 ) {
+				$('p.list-item-time').text('starts in ' + Math.ceil(data.timeLeft/60000.0) + ' minutes');
+			} else {
+				$('p.list-item-time').text('starts in ' + Math.ceil(data.timeLeft/1000.0) + ' seconds!');
+			}
+			$('ul.party-list').show(); // make sure we are visible
         }
-		// Add to the list of available parties
     });
     
     socket.on('party ended', function(data) {
