@@ -47,10 +47,10 @@ function joinDanceParty(pid){
 }
 
 function prepDanceParty(data){
-    var startDate = data.startDate;
+    var startDate = Date.now() + data.timeLeft;
     // set an interval that spirals closer to the closing time
     var callback = function(){
-        if ( Date.now() >= data.startDate ) {
+        if ( Date.now() >= startDate ) {
             // Fucking dance off
             danceOff(data);
         } else {
@@ -119,6 +119,11 @@ function getId(){
     } else {
         id = guid();
     }
+}
+ 
+// Iphone 5/6 unlock audio
+function unlockAudio(){
+noteOn
 }
  
 function loadAudio(url) {

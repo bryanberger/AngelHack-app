@@ -59,8 +59,6 @@ function partyCountdown(socket){
     var callback = function(){
         var dataPacket = {
             partyId:  flatDB.activeParty.id,
-            startDate : flatDB.activeParty.startDate,
-            endDate : flatDB.activeParty.endDate,
             userCnt : flatDB.activeParty.userList.length
         };
         socket.emit('party starting', dataPacket);
@@ -98,8 +96,7 @@ function addToParty(pid, uid, socket){
         socket.emit('party accepted', JSON.stringify({
             userId: uid,
             partyId: flatDB.activeParty.id,
-            startDate: flatDB.activeParty.startDate,
-            endDate:flatDB.activeParty.endDate
+			timeLeft: flatDB.activeParty.startDate - Date.now()
         }));
         return true;
     }
@@ -130,8 +127,7 @@ function createNewParty(uid, socket){
     socket.emit('party accepted', JSON.stringify({
             userId: uid,
             partyId: flatDB.activeParty.id,
-            startDate: flatDB.activeParty.startDate,
-            endDate:flatDB.activeParty.endDate
+			timeLeft: flatDB.activeParty.startDate - Date.now()
     }));
    
     // Start emitting there is a party
