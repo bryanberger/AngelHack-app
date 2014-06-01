@@ -6,7 +6,7 @@
 ## What is it?
 Have the urge to start a dance party...right now? Well, CrowdBox is a crowd sourced flashmob boombox that harnesses the speaker power of multiple mobile devices in the same vicinity to create an exponentially louder sound.
 
-One device alone play music is negligible, but multiple that by 10 or 20 devices and you've created an orchestra of sound!
+One device alone playing music is negligible, but multiple that by 10 or 20 devices and you've created an orchestra of sound!
 
 ## Our Philosophy
 We want to encourage movement and dancing at a moment's notice. CrowdBox promotes people to smile, have fun, and enjoy the moment.
