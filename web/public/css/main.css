@@ -213,7 +213,9 @@ ul {
     margin: 40px auto;
 }
 
-
+.dance-img {
+    width: 100%;
+}
 
 .fill {
     width: 100%;

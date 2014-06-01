@@ -368,6 +368,9 @@ var PageTransitions = (function () {
             // Setting the isAnimating property to true.
             $pageWrapper.data('isAnimating', true);
 
+            // scroll to top
+            window.scrollTo(0,0);
+
             // Current page to be removed.
             var $currentPage = $pages.eq(currentPageIndex);
 
