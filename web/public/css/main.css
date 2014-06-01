@@ -151,7 +151,9 @@ ul {
     background: url('../imgs/icnDistance.png') no-repeat;
 }
 
-.list-item-title, .partyName {
+.list-item-title,
+.partyName,
+.header-item  {
     padding: 0; margin: 0;
     color: #31A8C2;
     font-size: 20px;
@@ -159,9 +161,10 @@ ul {
 }
 
 .list-item-time {
-    padding: 0; margin: 0;
+    padding: 0 0 0 30px; margin: 0;
     color: #31A8C2;
     font-style: italic;
+    background: url('../imgs/icnTime.png') left center no-repeat;
 }
 
 .icnTime {
@@ -235,7 +238,7 @@ dl, dd, dt {
 
 
 dd {
-    margin-bottom: 2em;
+    margin-bottom: 1.5em;
 }
 
 textarea {
