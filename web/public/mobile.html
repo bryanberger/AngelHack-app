@@ -21,16 +21,7 @@
         
         <div class="pt-wrapper">
 
-<!--             <div class="pt-trigger-container">
-                <button class="pt-trigger" data-animation="1" data-goto="-1">Go to next page</button>
-                <button class="pt-trigger" data-animation="2" data-goto="-2">Go to previous page</button>
-
-                <button class="pt-trigger" data-animation="50" data-goto="1">Go to page 1</button>
-                <button class="pt-trigger" data-animation="51" data-goto="2">Go to page 2</button>
-            </div> -->
-
             <!-- Home Page -->
-
             <div class="pt-page pt-page-1">
                 <img class="header" src="imgs/Header.svg">
                 <div class="sub-head">
@@ -71,28 +62,25 @@
 
                 <form id="createForm" action="#" method="post">
 
-                  <div>
-                    <label for="name">Text Input:</label>
-                    <input type="text" name="name" id="name" value="" tabindex="1">
-                   </div>
+                    <dl>
+                        <dt>Name of party</dt>
+                        <dd><input type="text" name="name" id="name" value="" tabindex="1"></dd>
 
-                  <div>
-                    <label for="select-choice">Select Dropdown Choice:</label>
-                    <select name="select-choice" id="select-choice">
-                      <option value="Choice 1">Choice 1</option>
-                      <option value="Choice 2">Choice 2</option>
-                      <option value="Choice 3">Choice 3</option>
-                    </select>
-                  </div>
-                    
-                  <div>
-                    <label for="textarea">Textarea:</label>
-                    <textarea cols="40" rows="8" name="textarea" id="textarea"></textarea>
-                  </div>
-                    <div class="btn btnCreate pt-trigger" data-animation="1" data-goto="4"></div>
-                </form>
+                        <dt>Genre:</dt>
+                        <dd>
+                            <select name="genre" id="genre">
+                                <option value="80s">80s Classics</option>
+                                <option value="electro">Electro</option>
+                                <option value="house">House</option>
+                            </select>
+                        </dd>
 
-                
+                        <dt>Description:</dt>
+                        <dd><textarea cols="40" rows="8" name="description" id="description"></textarea></dd>
+                    </dl>
+
+                    <div class="btn btnCreate pt-trigger" data-animation="1" data-goto="4"></div>                    
+                </form>        
             </div>
 
             <!-- Party page -->
