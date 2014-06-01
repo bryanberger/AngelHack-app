@@ -151,7 +151,7 @@ ul {
     background: url('../imgs/icnDistance.png') no-repeat;
 }
 
-.list-item-title {
+.list-item-title, .partyName {
     padding: 0; margin: 0;
     color: #31A8C2;
     font-size: 20px;
@@ -213,7 +213,7 @@ ul {
     margin: 40px auto;
 }
 
-.dance-img {
+.dance-img img {
     width: 100%;
 }
 
