@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="292px" height="88px" viewBox="0 0 292 88" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.0.2 (7799) - http://www.bohemiancoding.com/sketch -->
+    <title>btnStartParty</title>
+    <description>Created with Sketch.</description>
+    <defs></defs>
+    <g id="Welcome" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="Home" sketch:type="MSArtboardGroup" transform="translate(-174.000000, -979.000000)">
+            <g id="btnStartParty" sketch:type="MSLayerGroup" transform="translate(174.000000, 979.000000)">
+                <rect id="Rectangle-2" stroke="#31A8C2" sketch:type="MSShapeGroup" x="0" y="0" width="292" height="88" rx="12"></rect>
+                <text id="Start-a-Party" sketch:type="MSTextLayer" font-family="Avenir Next" font-size="38" font-weight="normal" fill="#31A8C2">
+                    <tspan x="46" y="56">Start a Party</tspan>
+                </text>
+            </g>
+        </g>
+    </g>
+</svg>
