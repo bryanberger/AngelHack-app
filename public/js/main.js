@@ -80,7 +80,7 @@ function joinDanceParty(pid){
 }
 
 function prepDanceParty(data){
-    var startDate = Date.now() + data.timeLeft;
+    var startDate = data.startDate;
     // set an interval that spirals closer to the closing time
     var callback = function(){
         if ( songReady === true && Date.now() >= startDate ) {

@@ -75,6 +75,7 @@ function partyCountdown(socket){
 			partyDescription : flatDB.activeParty.partyDescription,
 			timeLeft : flatDB.activeParty.startDate - Date.now(),
 			timeExpires : flatDB.activeParty.endDate - Date.now(),
+            startDate : flatDB.activeParty.startDate,
             userCnt : flatDB.activeParty.userList.length
         };
         socket.emit('party starting', dataPacket);
@@ -110,6 +111,7 @@ function sendPartyAccepted(data, socket){
 		userId: data.userId,
 		partyId: flatDB.activeParty.id,
 		timeLeft: flatDB.activeParty.startDate - Date.now(),
+        startDate: flatDB.activeParty.startDate,
 		songId: flatDB.activeParty.songId,
 		songTitle: flatDB.activeParty.songTitle,
 		songPath: songFiles[flatDB.activeParty.songId],
@@ -120,10 +122,11 @@ function sendPartyAccepted(data, socket){
 
 function addToParty(data, socket){
     if ( typeof flatDB.activeParty !== 'undefined'
-	   && flatDB.activeParty.id == data.partyId
-	   && flatDB.activeParty.userList.indexOf(data.userId) === -1 ) {
-        flatDB.activeParty.userList.push(data.userId);
-        updateDB();
+	   && flatDB.activeParty.id == data.partyId ) {
+        if ( flatDB.activeParty.userList.indexOf(data.userId) === -1 ) {
+            flatDB.activeParty.userList.push(data.userId);
+            updateDB();
+        }
         sendPartyAccepted(data, socket);	
         return true;
     }
@@ -131,7 +134,7 @@ function addToParty(data, socket){
 
 function createNewParty(data, socket){
     // check to see if this user is currently in an active party
-    if ( typeof flatDB.activeParty !== 'undefined' && flatDB.activeParty.userList.indexOf(data.userId) ) {
+    if ( typeof flatDB.activeParty !== 'undefined' ) {
         // User is currently already in the active party list, do not let them start a new party
         return false;
     } else if ( typeof flatDB.activeParty !== 'undefined' && 
