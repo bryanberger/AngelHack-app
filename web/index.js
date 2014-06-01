@@ -65,6 +65,9 @@ function setDBValue(key, value){
 
 function partyCountdown(socket){
     var callback = function(){
+		if ( flatDB.activeParty == undefined) {
+			return; // race condition, just exist out for now
+		}
         var dataPacket = {
             partyId : flatDB.activeParty.id,
             userCnt : flatDB.activeParty.userList.length
@@ -92,22 +95,26 @@ function finishParty(socket, partyId){
     updateDB();
 }
 
+function sendPartyAccepted(data, socket){
+	socket.emit('party accepted', JSON.stringify({
+		userId: data.userId,
+		partyId: flatDB.activeParty.id,
+		timeLeft: flatDB.activeParty.startDate - Date.now(),
+		songId: flatDB.activeParty.songId,
+		songTitle: flatDB.activeParty.songTitle,
+		songPath: songFiles[flatDB.activeParty.songId],
+		partyName: flatDB.activeParty.partyName,
+		partyDescription: flatDB.activeParty.partyDescription
+    }));
+}
+
 function addToParty(data, socket){
     if ( typeof flatDB.activeParty !== 'undefined'
 	   && flatDB.activeParty.id == data.partyId
 	   && flatDB.activeParty.userList.indexOf(data.userId) === -1 ) {
         flatDB.activeParty.userList.push(data.userId);
         updateDB();
-        socket.emit('party accepted', JSON.stringify({
-            userId: data.userId,
-			partyId: flatDB.activeParty.id,
-			timeLeft: flatDB.activeParty.startDate - Date.now(),
-			songId: flatDB.activeParty.songId,
-			songTitle: flatDB.activeParty.songTitle,
-			songPath: songFiles[flatDB.activeParty.songId],
-			partyName: flatDB.activeParty.partyName,
-			partyDescription: flatDB.activeParty.partyDescription
-        }));		
+        sendPartyAccepted(data, socket);	
         return true;
     }
 }
@@ -138,17 +145,8 @@ function createNewParty(data, socket){
     });
     
     // Send to our creator that this party was started
-    socket.emit('party accepted', JSON.stringify({
-		userId: data.userId,
-		partyId: flatDB.activeParty.id,
-		timeLeft: flatDB.activeParty.startDate - Date.now(),
-		songId: flatDB.activeParty.songId,
-		songTitle: flatDB.activeParty.songTitle,
-		songPath: songFiles[flatDB.activeParty.songId],
-		partyName: flatDB.activeParty.partyName,
-		partyDescription: flatDB.activeParty.partyDescription
-    }));
-   
+    sendPartyAccepted(data, socket);
+	
     // Start emitting there is a party
     partyCountdown(socket);
     

@@ -8,7 +8,10 @@ var soundBuffer = null;
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 var context = new AudioContext();
 var ctxSource;
-
+var danceOffNow = false;
+var currentPartyId;
+var newPartyId;
+var partyReady = false;
 var partyGifs = ['http://static.fjcdn.com/gifs/Praise_f5e992_796049.gif',
 				'http://media2.giphy.com/media/kgKrO1A3JbWTK/giphy.gif',
 				'http://mashable.com/wp-content/uploads/2013/06/Party-GIF.gif',
@@ -17,7 +20,10 @@ var partyGifs = ['http://static.fjcdn.com/gifs/Praise_f5e992_796049.gif',
 				'http://static.fjcdn.com/gifs/PARTY_6f9750_2098765.gif',
 				'http://31.media.tumblr.com/c99133aa872ca545945d804a5d2a0216/tumblr_mglmrjTf2E1rusugho1_500.gif',
 				'http://media.giphy.com/media/wtVljL9rUURW0/giphy.gif'];
-
+var id;
+var partyTimerId = -1;
+var songReady = false;
+			
 var guid = (function() {
   function s4() {
     return Math.floor((1 + Math.random()) * 0x10000)
@@ -28,13 +34,8 @@ var guid = (function() {
     return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
            s4() + '-' + s4() + s4() + s4();
   };
-})();
+})(); 
 
-var id;
-var currentPartyId;
-var newPartyId;
-var partyReady = false;
- 
 function startDanceParty(){
     console.log('starting dance party');
 
@@ -64,7 +65,7 @@ function startDanceParty(){
 
 function setPartyStarting(data){
     currentPartyId = data.partyId;
-	loadAudio(data.songPath); // load the song
+	loadAudio(data.songPath,function(){songReady=true;}); // load the song
     prepDanceParty(data);
 }
 
@@ -78,17 +79,18 @@ function prepDanceParty(data){
     var startDate = Date.now() + data.timeLeft;
     // set an interval that spirals closer to the closing time
     var callback = function(){
-        if ( Date.now() >= startDate ) {
+        if ( songReady === true && Date.now() >= startDate ) {
             // Frakking dance off
 			$('div.timerUpdate').text('');
             danceOff(data);
         } else {
 			// Update our dance off text
 			$('div.partyName').text('Party name: ' + data.partyName);
+			$('div.songPath').text('Song path: ' + data.songPath);
 			$('div.genre').text('Song title: ' + data.songTitle);
 			$('div.partyDesc').text('Party Description: ' + data.partyDescription);
 			$('div.timerUpdate').text('Party starts in ' + Math.ceil((startDate - Date.now())/1000) + ' seconds.....');
-            setTimeout(callback, 10);
+            partyTimerId = setTimeout(callback, 10);
         }
     };
     callback();
@@ -102,13 +104,26 @@ function danceOff(data){
     ctxSource.noteOn(0);                           // play the source now
 	var idx = Math.floor(Math.random()*partyGifs.length);
     $(".dance-img").prepend('<img src="' + partyGifs[idx] + '" />');
+	danceOffNow = true;
+}
+
+function danceOver(){
+	// leave party
+	$('.dance-img img').remove();
+	ctxSource.noteOff(0);
+	resetState();
+	// transition to home page, remove item from party-list
+	PageTransitions.animate($('#goHome'));
 }
 
 // Reset our current state
 function resetState(){
 	partyReady = false;
+	danceOffNow = false;
+	songReady = false;
 }
 
+// Button events
 function partyButtonClick(){
 	startDanceParty();
 }
@@ -119,10 +134,21 @@ function joinButtonClick(){
 			joinDanceParty(newPartyId);
 		} else {
 			$('div.timerUpdate').text('Waiting for party....');
-			setTimeout(callback, 250);
+			partyTimerId = setTimeout(callback, 250);
 		}
 	};
 	callback();
+}
+
+// Check to see if we are in the middle of a dance party
+function backButtonClick(){
+	if ( danceOffNow === true ) {
+		console.log('leaving the party early');
+		danceOver();		
+	} else { 
+		console.log('canceled any chance of a party');
+		clearInterval(partyTimerId); // if this is set
+	}
 }
 
 function dancePartyTime() {    
@@ -147,12 +173,10 @@ function dancePartyTime() {
     });
     
     socket.on('party ended', function(data) {
-        console.log('a party just ended');
-        $('.dance-img img').remove();
-        ctxSource.noteOff(0);
-        resetState();
-		// transition to home page, remove item from party-list
-        PageTransitions.animate($('#goHome'));
+		if ( data.partyId === currentPartyId && danceOffNow == true ) {
+			console.log('a party just ended');
+			danceOver();
+		}
     });
 }
  
@@ -160,6 +184,7 @@ function addEventHandlers(){
     dancePartyTime();
     $('.btnCreate').click(partyButtonClick);
 	$('.btnJoin').click(joinButtonClick);
+	$('.btnBack').click(backButtonClick);
 }
 
 function getUserId(){
@@ -185,13 +210,16 @@ function unlockAudio(){
 	ctxSource.noteOff(0);
 }
  
-function loadAudio(url) {
+function loadAudio(url, cb) {
     var request = new XMLHttpRequest();
     request.open('GET', url, true);
     request.responseType = 'arraybuffer';
     var callback = function() {
         context.decodeAudioData(request.response, function(buffer) {
             soundBuffer = buffer;
+			if ( typeof cb !== 'undefined' ) {
+				cb();
+			}
         });
     };
     // Decode asynchronously
