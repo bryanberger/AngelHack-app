@@ -121,6 +121,7 @@ function dancePartyTime() {
         resetState();
 
         // transition to home page, remove item from party-list
+        PageTransitions.animate($('#goHome'));
     });
 }
  

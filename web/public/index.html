@@ -9,10 +9,6 @@
         <meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="mobile-web-app-capable" content="yes">
 		
-		<script src="jquery-2.1.1.min.js"></script>
-		<script src="socket.io-1.0.2.js"></script>
-		<script src="main.js"></script>
-		
         <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,700' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href="css/normalize.css">
         <link rel="stylesheet" href="css/animations.css"/>
@@ -90,7 +86,7 @@
 
             <!-- Party page -->
             <div class="pt-page pt-page-4">
-                <div class="btn btnBack pt-trigger" data-animation="2" data-goto="1"></div>
+                <div id="goHome" class="btn btnBack pt-trigger" data-animation="21" data-goto="1"></div>
 
                 <div class="page-wrap">
                     <div class="timerUpdate"></div>
@@ -108,6 +104,8 @@
 
         <script src="jquery-2.1.1.min.js"></script>
         <script src="js/transition.js"></script>
+        <script src="socket.io-1.0.2.js"></script>
+        <script src="main.js"></script>
 
     </body>
 </html>

@@ -458,6 +458,7 @@ var PageTransitions = (function () {
 
     return {
         init : init,
+        animate : Animate
     };
 
 })();
