@@ -12,6 +12,11 @@ var flatDBName = 'db.json';
 var startTimer = 5000; // 5 seconds until a dance starts
 var danceTime = 10000;
 var endTimer = startTimer + danceTime; // 20 second dance parties
+var songFiles = {
+	'80s':'dancesong1.mp3',
+	'electro':'dancesong2.mp3',
+	'house':'dancesong3.mp3'
+};
 
 var guid = (function() {
   function s4() {
@@ -98,7 +103,12 @@ function addToParty(pid, uid, socket){
         socket.emit('party accepted', JSON.stringify({
             userId: uid,
             partyId: flatDB.activeParty.id,
-			timeLeft: flatDB.activeParty.startDate - Date.now()
+			timeLeft: flatDB.activeParty.startDate - Date.now(),
+			songId: flatDB.activeParty.songId,
+			songTitle: data.songTitle,
+			songPath: songFiles[data.songId],
+			partyName: flatDB.activeParty.partyName,
+			partyDescription: flatDB.activeParty.partyDescription
         }));
         return true;
     }
@@ -131,13 +141,14 @@ function createNewParty(data, socket){
     
     // Send to our creator that this party was started
     socket.emit('party accepted', JSON.stringify({
-            userId: data.userId,
-            partyId: flatDB.activeParty.id,
-			timeLeft: flatDB.activeParty.startDate - Date.now(),
-			songId: flatDB.activeParty.songId,
-			songTitle: data.songTitle,
-			partyName: flatDB.activeParty.partyName,
-			partyDescription: flatDB.activeParty.partyDescription
+		userId: data.userId,
+		partyId: flatDB.activeParty.id,
+		timeLeft: flatDB.activeParty.startDate - Date.now(),
+		songId: flatDB.activeParty.songId,
+		songTitle: data.songTitle,
+		songPath: songFiles[data.songId],
+		partyName: flatDB.activeParty.partyName,
+		partyDescription: flatDB.activeParty.partyDescription
     }));
    
     // Start emitting there is a party

@@ -39,13 +39,12 @@ function startDanceParty(){
     console.log('starting dance party');
 
 	var callback = function(geoPos){	
-		var select = $('select#partyMusic');
 		var dataBuffer = {
 			userId: id,
-			songId: $('select#partyMusic option:selected').val(),
-			songTitle: $('select#partyMusic option:selected').text(),
-			partyName: $('input#partyName').val(),
-			partyDescription: $('textarea#partyDesc').val()
+			songId: $('select#genre option:selected').val(),
+			songTitle: $('select#genre option:selected').text(),
+			partyName: $('input#name').val(),
+			partyDescription: $('textarea#description').val()
 		};
 		socket.emit('new party', JSON.stringify(dataBuffer));
 		unlockAudio();
@@ -65,7 +64,7 @@ function startDanceParty(){
 
 function setPartyStarting(data){
     currentPartyId = data.partyId;
-	loadAudio(data.songId); // load the song
+	loadAudio(data.songPath); // load the song
     prepDanceParty(data);
 }
 
@@ -86,7 +85,7 @@ function prepDanceParty(data){
         } else {
 			// Update our dance off text
 			$('div.partyName').text('Party name: ' + data.partyName);
-			$('div.songTitle').text('Song title: ' + data.songTitle);
+			$('div.genre').text('Song title: ' + data.songTitle);
 			$('div.partyDescription').text('Party Description: ' + data.partyDescription);
 			$('div.timerUpdate').text('Party starts in ' + Math.ceil((startDate - Date.now())/1000) + ' seconds.....');
             setTimeout(callback, 10);
@@ -102,7 +101,7 @@ function danceOff(data){
     ctxSource.connect(context.destination);   // connect the source to the context's destination (the speakers)
     ctxSource.noteOn(0);                           // play the source now
 	var idx = Math.floor(Math.random()*partyGifs.length);
-    $("body").prepend('<img src="' + partyGifs[idx] + '" />');
+    $(".dance-img").prepend('<img src="' + partyGifs[idx] + '" />');
 }
 
 // Reset our current state
@@ -149,9 +148,11 @@ function dancePartyTime() {
     
     socket.on('party ended', function(data) {
         console.log('a party just ended');
-        $('body img:first').remove();
+        $('.dance-img img').remove();
         ctxSource.noteOff(0);
         resetState();
+		// transition to home page, remove item from party-list
+        PageTransitions.animate($('#goHome'));
     });
 }
  
