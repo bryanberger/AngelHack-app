@@ -85,6 +85,7 @@ function prepDanceParty(data){
     var callback = function(){
         if ( songReady === true && Date.now() >= startDate ) {
             // Frakking dance off
+            clearInterval(partyTimerId);
 			$('div.timerUpdate').text('');
 			$('.secs').text('');
             danceOff(data);
@@ -94,13 +95,17 @@ function prepDanceParty(data){
 			//$('div.songPath').text('Song path: ' + data.songPath);
 			$('div.genre').text('Genre: ' + data.songTitle);
 			//$('div.partyDesc').text('Party Description: ' + data.partyDescription);
-			$('div.timerUpdate').text(Math.ceil((startDate - Date.now())/1000));
+			if ( startDate - Date.now() > 0.0 ) {
+                $('div.timerUpdate').text(Math.ceil((startDate - Date.now())/1000));
+            } else {
+                $('div.timerUpdate').text('0');
+            }
 			$('.secs').text('seconds until party...');
 
-            partyTimerId = setTimeout(callback, 10);
+            
         }
     };
-    callback();
+    partyTimerId = setInterval(callback, 10);
 }
 
 // Dance off NOW!
