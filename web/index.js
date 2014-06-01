@@ -12,6 +12,11 @@ var flatDBName = 'db.json';
 var startTimer = 5000; // 5 seconds until a dance starts
 var danceTime = 10000;
 var endTimer = startTimer + danceTime; // 20 second dance parties
+var songFiles = {
+	'80s':'dancesong1.mp3',
+	'electro':'dancesong2.mp3',
+	'house':'dancesong3.mp3'
+};
 
 var guid = (function() {
   function s4() {
@@ -61,7 +66,7 @@ function setDBValue(key, value){
 function partyCountdown(socket){
     var callback = function(){
         var dataPacket = {
-            partyId:  flatDB.activeParty.id,
+            partyId : flatDB.activeParty.id,
             userCnt : flatDB.activeParty.userList.length
         };
         socket.emit('party starting', dataPacket);
@@ -98,15 +103,20 @@ function addToParty(pid, uid, socket){
         socket.emit('party accepted', JSON.stringify({
             userId: uid,
             partyId: flatDB.activeParty.id,
-			timeLeft: flatDB.activeParty.startDate - Date.now()
+			timeLeft: flatDB.activeParty.startDate - Date.now(),
+			songId: flatDB.activeParty.songId,
+			songTitle: data.songTitle,
+			songPath: songFiles[data.songId],
+			partyName: flatDB.activeParty.partyName,
+			partyDescription: flatDB.activeParty.partyDescription
         }));
         return true;
     }
 }
 
-function createNewParty(uid, socket){
+function createNewParty(data, socket){
     // check to see if this user is currently in an active party
-    if ( typeof flatDB.activeParty !== 'undefined' && flatDB.activeParty.userList.indexOf(uid) ) {
+    if ( typeof flatDB.activeParty !== 'undefined' && flatDB.activeParty.userList.indexOf(data.userId) ) {
         // User is currently already in the active party list, do not let them start a new party
         return false;
     } else if ( typeof flatDB.activeParty !== 'undefined' && 
@@ -115,21 +125,30 @@ function createNewParty(uid, socket){
         return false
     }
      
-    // Create a fucking party
+    // Create a party
     setDBValue('activeParty',{
         id:  guid(),
-        userInitiated : uid,
+        userInitiated : data.userId,
         initDate : Date.now(),
         startDate : Date.now() + startTimer,
         endDate : Date.now() + endTimer,
-        userList : [uid]
+		songId: data.songId,
+		songTitle: data.songTitle,
+		partyName: data.partyName,
+		partyDescription: data.partyDescription,
+        userList : [data.userId]
     });
     
     // Send to our creator that this party was started
     socket.emit('party accepted', JSON.stringify({
-            userId: uid,
-            partyId: flatDB.activeParty.id,
-			timeLeft: flatDB.activeParty.startDate - Date.now()
+		userId: data.userId,
+		partyId: flatDB.activeParty.id,
+		timeLeft: flatDB.activeParty.startDate - Date.now(),
+		songId: flatDB.activeParty.songId,
+		songTitle: data.songTitle,
+		songPath: songFiles[data.songId],
+		partyName: flatDB.activeParty.partyName,
+		partyDescription: flatDB.activeParty.partyDescription
     }));
    
     // Start emitting there is a party
@@ -148,7 +167,7 @@ app.use(express.static(__dirname + '/public'));
 io.on('connection', function(socket) {
     socket.on('new party', function(Data){
         var dataObj = JSON.parse(Data);
-        if ( createNewParty(dataObj.userId, socket) ){
+        if ( createNewParty(dataObj, socket) ){
             console.log('Party started!');
         } else {
             console.log('User ' + dataObj.userId + ' could not start a party!');
