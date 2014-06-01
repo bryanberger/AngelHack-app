@@ -11,6 +11,7 @@
 		
 		<script src="jquery-2.1.1.min.js"></script>
 		<script src="socket.io-1.0.2.js"></script>
+		<script src="geo-min.js"></script>
 		<script src="main.js"></script>
 		
         <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,700' rel='stylesheet' type='text/css'>
@@ -77,13 +78,13 @@
                 <form id="createForm" action="#" method="post">
 
                   <div>
-                    <label for="name">Text Input:</label>
-                    <input type="text" name="name" id="name" value="" tabindex="1">
+                    <label for="name">Party Name:</label>
+                    <input type="text" name="name" id="partyName" value="Dance Party Fever" tabindex="1">
                    </div>
 
                   <div>
-                    <label for="select-choice">Select Dropdown Choice:</label>
-                    <select name="select-choice" id="select-choice">
+                    <label for="select-choice">Select Music Choice:</label>
+                    <select name="select-choice" id="partyMusic">
                       <option value="dancesong1.mp3">Everybody Dance Now</option>
                       <option value="dancesong2.mp3">Moves Like Jagger</option>
                       <option value="dancesong3.mp3">Party Rock</option>
@@ -91,8 +92,8 @@
                   </div>
                     
                   <div>
-                    <label for="textarea">Textarea:</label>
-                    <textarea cols="40" rows="8" name="textarea" id="textarea"></textarea>
+                    <label for="textarea">Party Description:</label>
+                    <textarea cols="40" rows="8" name="textarea" id="partyDesc">Party like its 1999!</textarea>
                   </div>
                     <div class="btn btnCreate pt-trigger" data-animation="1" data-goto="4"></div>
                 </form>
@@ -104,6 +105,9 @@
             <div class="pt-page pt-page-4">
                 <div class="btn btnBack pt-trigger" data-animation="2" data-goto="1"></div>
                 PARTY PAGE !!! LETS GO!!!! AUDIO HERER!!!!
+				<div class="partyName"></div>
+				<div class="songTitle"></div>
+				<div class="partyDescription"></div>
 				<div class="timerUpdate"></div>
             </div>
 

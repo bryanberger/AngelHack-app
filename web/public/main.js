@@ -9,6 +9,15 @@ window.AudioContext = window.AudioContext || window.webkitAudioContext;
 var context = new AudioContext();
 var ctxSource;
 
+var partyGifs = ['http://static.fjcdn.com/gifs/Praise_f5e992_796049.gif',
+				'http://media2.giphy.com/media/kgKrO1A3JbWTK/giphy.gif',
+				'http://mashable.com/wp-content/uploads/2013/06/Party-GIF.gif',
+				'http://media2.giphy.com/media/hsBZfDG7wiWHu/giphy.gif',
+				'http://college-social.com/content/uploads/sites/7/2014/03/jimmyelmo_its_a_gif_party-s480x270-142843-580.gif',
+				'http://static.fjcdn.com/gifs/PARTY_6f9750_2098765.gif',
+				'http://31.media.tumblr.com/c99133aa872ca545945d804a5d2a0216/tumblr_mglmrjTf2E1rusugho1_500.gif',
+				'http://media.giphy.com/media/wtVljL9rUURW0/giphy.gif'];
+
 var guid = (function() {
   function s4() {
     return Math.floor((1 + Math.random()) * 0x10000)
@@ -28,16 +37,36 @@ var partyReady = false;
  
 function startDanceParty(){
     console.log('starting dance party');
-    var dataBuffer = {userId: id};
-    socket.emit('new party', JSON.stringify(dataBuffer));
-	unlockAudio();
+
+	var callback = function(geoPos){	
+		var select = $('select#partyMusic');
+		var dataBuffer = {
+			userId: id,
+			songId: $('select#partyMusic option:selected').val(),
+			songTitle: $('select#partyMusic option:selected').text(),
+			partyName: $('input#partyName').val(),
+			partyDescription: $('textarea#partyDesc').val()
+		};
+		socket.emit('new party', JSON.stringify(dataBuffer));
+		unlockAudio();
+	};
+
+	//determine if the handset has client side geo location capabilities
+	if(geo_position_js.init()){
+	   geo_position_js.getCurrentPosition(callback, callback);
+	}
+	else{
+	   console.log('Could not connect to geo');
+	   callback();
+	}
+
     return false;
 }
 
 function setPartyStarting(data){
     currentPartyId = data.partyId;
+	loadAudio(data.songId); // load the song
     prepDanceParty(data);
-
 }
 
 function joinDanceParty(pid){
@@ -51,11 +80,14 @@ function prepDanceParty(data){
     // set an interval that spirals closer to the closing time
     var callback = function(){
         if ( Date.now() >= startDate ) {
-            // Fucking dance off
+            // Frakking dance off
 			$('div.timerUpdate').text('');
             danceOff(data);
         } else {
 			// Update our dance off text
+			$('div.partyName').text('Party name: ' + data.partyName);
+			$('div.songTitle').text('Song title: ' + data.songTitle);
+			$('div.partyDescription').text('Party Description: ' + data.partyDescription);
 			$('div.timerUpdate').text('Party starts in ' + Math.ceil((startDate - Date.now())/1000) + ' seconds.....');
             setTimeout(callback, 10);
         }
@@ -69,8 +101,8 @@ function danceOff(data){
     ctxSource.buffer = soundBuffer;           // tell the source which sound to play
     ctxSource.connect(context.destination);   // connect the source to the context's destination (the speakers)
     ctxSource.noteOn(0);                           // play the source now
-                                             
-    $("body").prepend('<img src="http://media2.giphy.com/media/kgKrO1A3JbWTK/giphy.gif" />');
+	var idx = Math.floor(Math.random()*partyGifs.length);
+    $("body").prepend('<img src="' + partyGifs[idx] + '" />');
 }
 
 // Reset our current state
@@ -112,6 +144,7 @@ function dancePartyTime() {
             newPartyId = data.partyId;
 			partyReady = true;
         }
+		// Add to the list of available parties
     });
     
     socket.on('party ended', function(data) {
@@ -128,7 +161,7 @@ function addEventHandlers(){
 	$('.btnJoin').click(joinButtonClick);
 }
 
-function getId(){
+function getUserId(){
     if ( typeof(Storage) !== 'undefined' ){
         var localItem = localStorage.getItem('id');
         if ( localItem !== null ){
@@ -155,13 +188,11 @@ function loadAudio(url) {
     var request = new XMLHttpRequest();
     request.open('GET', url, true);
     request.responseType = 'arraybuffer';
-    
     var callback = function() {
         context.decodeAudioData(request.response, function(buffer) {
             soundBuffer = buffer;
         });
     };
-    
     // Decode asynchronously
     if ( typeof request.addEventListener !== 'undefined' ) {
         request.addEventListener('load', callback, false);
@@ -176,7 +207,7 @@ $(document).ready( function(){
 		isReady = true;
         addEventHandlers();
         resetState();
-        getId();
-        loadAudio('dancesong3.mp3');
+        getUserId();
+		loadAudio('fluffer.wav'); // made to unlock audio on Iphone 5/6
     }
 });
