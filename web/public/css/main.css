@@ -245,6 +245,23 @@ textarea {
     width: 100%;
 }
 
+.timerUpdate {
+    font-size: 10em;
+    font-weight: bold;
+    color: #31A8C2;
+    text-align: center;
+}
+
+
+div.small {
+    text-align: center;
+    color: #bdbdbd;
+}
+
+.play-detail {
+    margin-bottom: 30px;
+}
+
 /* ==========================================================================
    Helper classes
    ========================================================================== */

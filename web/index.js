@@ -91,13 +91,18 @@ function partyCountdown(socket){
 
 // Go through our list of users, tell them its all done
 function finishParty(socket, partyId){
-    console.log('Ending the party ' + flatDB.activeParty.id + ', archiving');
-    // Save our database, archive the current party
-    flatDB.archive[flatDB.activeParty.id.toString()] = flatDB.activeParty;
-    socket.emit('party ended', {partyId: flatDB.activeParty.id});
-    socket.broadcast.emit('party ended', {partyId: flatDB.activeParty.id});
-    flatDB.activeParty = undefined;
-    updateDB();
+
+    if (typeof flatDB.activeParty !== 'undefined') {
+        console.log('Ending the party ' + flatDB.activeParty.id + ', archiving');
+        
+        // Save our database, archive the current party
+        flatDB.archive[flatDB.activeParty.id.toString()] = flatDB.activeParty;
+        socket.emit('party ended', {partyId: flatDB.activeParty.id});
+        socket.broadcast.emit('party ended', {partyId: flatDB.activeParty.id});
+        flatDB.activeParty = undefined;
+        updateDB();
+    }
+    
 }
 
 function sendPartyAccepted(data, socket){

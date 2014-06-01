@@ -86,14 +86,17 @@ function prepDanceParty(data){
         if ( songReady === true && Date.now() >= startDate ) {
             // Frakking dance off
 			$('div.timerUpdate').text('');
+			$('.secs').text('');
             danceOff(data);
         } else {
 			// Update our dance off text
-			$('div.partyName').text('Party name: ' + data.partyName);
-			$('div.songPath').text('Song path: ' + data.songPath);
-			$('div.genre').text('Song title: ' + data.songTitle);
-			$('div.partyDesc').text('Party Description: ' + data.partyDescription);
-			$('div.timerUpdate').text('Party starts in ' + Math.ceil((startDate - Date.now())/1000) + ' seconds.....');
+			$('div.partyName').text(data.partyName);
+			//$('div.songPath').text('Song path: ' + data.songPath);
+			$('div.genre').text('Genre: ' + data.songTitle);
+			//$('div.partyDesc').text('Party Description: ' + data.partyDescription);
+			$('div.timerUpdate').text(Math.ceil((startDate - Date.now())/1000));
+			$('.secs').text('seconds until party...');
+
             partyTimerId = setTimeout(callback, 10);
         }
     };
