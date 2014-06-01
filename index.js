@@ -17,7 +17,8 @@ var songFiles = {
 	'80s':'songs/dancesong1.mp3',
 	'electro':'songs/dancesong2.mp3',
 	'house':'songs/dancesong3.mp3',
-	'pop':'songs/dancesong4.mp3'
+	'pop':'songs/dancesong4.mp3',
+    'bowie':'songs/dancesong5.mp3'
 };
 
 var guid = (function() {
