@@ -1,23 +1,24 @@
-Angelhack git repo
+* **Working title:** CrowdBox
+* **Authors:** Bryan Berger & Luke Arntson
+* **Date:** 5/31/2014
+* **Event:** Angelhack 2014
 
-Working title: CrowdBox
-Authors: Bryan Berger & Luke Arntson
-Date: 5/31/2014
-Event: Angelhack 2014
+## What is it?
+Have the urge to start a dance party...right now? Well, CrowdBox is a crowd sourced flashmob boombox that harnesses the speaker power of multiple mobile devices in the same vicinity to create an exponentially louder sound.
 
-Mission Statement
-CrowdBox is a crowd sourced flashmob boombox. We want to encourage movement and dancing at a moment's notice. CrowdBox promotes people to smile, have fun, and enjoy the moment.
+## Our Philosophy
+We want to encourage movement and dancing at a moment's notice. CrowdBox promotes people to smile, have fun, and enjoy the moment.
 
-Feature List
-- The ability to start an event by anyone
-- The ability to join an event
-  - Tells user to turn their speaker up to max
-- Playing an event
+## Feature List
+- The ability to start a party event.
+- The ability to join a party.
+- Playing Synced Audio (buffering/server time technique)
   - Visual Stimulus (seizure inducing)
-- Leaderboard of the best dancers (Point system?)
-  - Movement
 - Party Configurator
   - Name, maybe brief description, coordinates (auto?), genre (song?)
-  - Boombox animation in 'party' view.
 
-Minimum Viable Product
+
+## Wishlist Features
+- Leaderboard of the best dancers (Point system?)
+  - Movement based on accelerometer
+- Boombox animation in 'party' view.
