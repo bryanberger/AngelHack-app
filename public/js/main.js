@@ -2,6 +2,7 @@
  * Main.js
  *  Main Javascript file.
  */
+ 
 var socket = io();
 var isReady = false;
 var soundBuffer = null;
@@ -151,16 +152,11 @@ function joinButtonClick(){
 function backButtonClick(){
 	if ( danceOffNow === true ) {
 		console.log('leaving the party early');
-		danceOver();
+		danceOver();		
 	} else { 
 		console.log('canceled any chance of a party');
 		clearInterval(partyTimerId); // if this is set
 	}
-        var dataBuffer = {
-            userId: id,
-            partyId: currentPartyId
-        };
-        socket.emit('leave party', JSON.stringify(dataBuffer));
 }
 
 // Force start the party
@@ -221,7 +217,7 @@ function dancePartyTime() {
     });
     
     socket.on('party ended', function(data) {
-		if ( data.partyId === currentPartyId ) {
+		if ( data.partyId === currentPartyId && danceOffNow == true ) {
 			console.log('a party just ended');
 			danceOver();
 		}

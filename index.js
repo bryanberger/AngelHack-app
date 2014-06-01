@@ -12,14 +12,13 @@ var flatDBName = 'db.json';
 var startTimer = 120*1000; // 30 seconds until a dance starts
 var danceTime = 30*1000; // dance parties are 30 seconds long
 var endTimer = startTimer + danceTime; // 20 second dance parties
+var startTimerId;
 var songFiles = {
 	'80s':'songs/dancesong1.mp3',
 	'electro':'songs/dancesong2.mp3',
 	'house':'songs/dancesong3.mp3',
 	'pop':'songs/dancesong4.mp3'
 };
-var startTimerId;
-var finishPartyTimer;
 
 var guid = (function() {
   function s4() {
@@ -86,7 +85,7 @@ function partyCountdown(socket){
             setTimeout(callback, 100);
         } else {
             // Party started!!!!!
-            finishPartyTimer = setTimeout(function(){finishParty(socket)}, danceTime); // tell our clients this party is done
+            setTimeout(function(){finishParty(socket)}, danceTime); // tell our clients this party is done
         }
     };    
     callback();
@@ -94,6 +93,7 @@ function partyCountdown(socket){
 
 // Go through our list of users, tell them its all done
 function finishParty(socket, partyId){
+
     if (typeof flatDB.activeParty !== 'undefined') {
         console.log('Ending the party ' + flatDB.activeParty.id + ', archiving');
 
@@ -160,25 +160,7 @@ function forcestartParty(data, socket){
     } else {
         return false;
     }
-}
-
-function leaveParty(data, socket){
-    if ( typeof flatDB.activeParty !== 'undefined'
-        && flatDB.activeParty.id === data.partyId ){
-        var idx = flatDB.activeParty.userList.indexOf(data.userId);
-        if ( idx > -1 ) {
-            flatDB.activeParty.userList.splice(idx, 1);
-        }
-        if ( flatDB.activeParty.userInitiated === data.userId ) {
-            // End party
-            clearInterval(finishPartyTimer);
-            finishParty(socket);
-        }
-        return true;
-    } else {
-        return false;
-    }
-}
+};
 
 function createNewParty(data, socket){
     // check to see if this user is currently in an active party
@@ -244,20 +226,10 @@ io.on('connection', function(socket) {
     socket.on('forcestart party', function(Data){
         var dataObj = JSON.parse(Data);
         console.log('User wants to forcestart party ' + dataObj.userId + ' : ' + dataObj.partyId);
-        if ( forcpestartParty(dataObj, socket) ){
+        if ( forcestartParty(dataObj, socket) ){
             console.log('User ' + dataObj.userId + ' force started the party ' + dataObj.partyId);
         } else {
             console.log('User ' + dataObj.userId + ' could not force start the party ' + dataObj.partyId);
-        }
-    });
-    
-    socket.on('leave party', function(Data){
-        var dataObj = JSON.parse(Data);
-        console.log('User wants to join party ' + dataObj.userId + ' : ' + dataObj.partyId);
-        if ( leaveParty(dataObj, socket) ){
-            console.log('User ' + dataObj.userId + ' added to party ' + dataObj.partyId);
-        } else {
-            console.log('User ' + dataObj.userId + ' could not be added to party ' + dataObj.partyId);
         }
     });
 });
