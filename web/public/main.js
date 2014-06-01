@@ -23,6 +23,8 @@ var guid = (function() {
 
 var id;
 var currentPartyId;
+var newPartyId;
+var partyReady = false;
  
 function startDanceParty(){
     console.log('starting dance party');
@@ -34,8 +36,6 @@ function startDanceParty(){
 
 function setPartyStarting(data){
     currentPartyId = data.partyId;
-    $('#danceParty').val('Party Starting...');
-    $('#danceParty').attr('disabled','disabled');
     prepDanceParty(data);
 
 }
@@ -67,15 +67,27 @@ function danceOff(data){
     ctxSource.connect(context.destination);   // connect the source to the context's destination (the speakers)
     ctxSource.noteOn(0);                           // play the source now
                                              
-    $('#danceParty').val('DANCE PARTY');
     $("body").prepend('<img src="http://media2.giphy.com/media/kgKrO1A3JbWTK/giphy.gif" />');
 }
 
 // Reset our current state
 function resetState(){
-    $('#danceParty').val('Start Party');
-    $('#danceParty').unbind('click').click(startDanceParty);
-    $('#danceParty').removeAttr('disabled');
+	partyReady = false;
+}
+
+function partyButtonClick(){
+	startDanceParty();
+}
+
+function joinButtonClick(){
+	var callback = function(){
+		if ( partyReady === true ) {
+			joinDanceParty(newPartyId);
+		} else {
+			setTimeout(callback, 250);
+		}
+	};
+	callback();
 }
 
 function dancePartyTime() {    
@@ -91,9 +103,10 @@ function dancePartyTime() {
     
     socket.on('party starting', function(data) {
         console.log('a party is about to start');
-        if ( data.partyId !== currentPartyId ) {
-            $('#danceParty').val('Join Party - ' + data.userCnt + ' Partiers');
-            $('#danceParty').unbind('click').click(function(){joinDanceParty(data.partyId)});
+        if ( data.partyId !== currentPartyId &&
+				data.partyId !== newPartyId ) {
+            newPartyId = data.partyId;
+			partyReady = true;
         }
     });
     
@@ -107,7 +120,8 @@ function dancePartyTime() {
  
 function addEventHandlers(){
     dancePartyTime();
-    $('#danceParty').unbind('click').click(startDanceParty);
+    $('.btnCreate').click(partyButtonClick);
+	$('.btnJoin').click(joinButtonClick);
 }
 
 function getId(){
@@ -155,10 +169,10 @@ function loadAudio(url) {
  
 $(document).ready( function(){
     if ( isReady === false ) {
+		isReady = true;
         addEventHandlers();
         resetState();
         getId();
         loadAudio('dancesong3.mp3');
-        isReady = true;
     }
 });
