@@ -13,10 +13,10 @@ var startTimer = 30*1000; // 30 seconds until a dance starts
 var danceTime = 30*1000; // dance parties are 30 seconds long
 var endTimer = startTimer + danceTime; // 20 second dance parties
 var songFiles = {
-	'80s':'dancesong1.mp3',
-	'electro':'dancesong2.mp3',
-	'house':'dancesong3.mp3',
-	'pop':'dancesong4.mp3'
+	'80s':'songs/dancesong1.mp3',
+	'electro':'songs/dancesong2.mp3',
+	'house':'songs/dancesong3.mp3',
+	'pop':'songs/dancesong4.mp3'
 };
 
 var guid = (function() {
@@ -94,7 +94,7 @@ function finishParty(socket, partyId){
 
     if (typeof flatDB.activeParty !== 'undefined') {
         console.log('Ending the party ' + flatDB.activeParty.id + ', archiving');
-        
+
         // Save our database, archive the current party
         flatDB.archive[flatDB.activeParty.id.toString()] = flatDB.activeParty;
         socket.emit('party ended', {partyId: flatDB.activeParty.id});

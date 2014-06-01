@@ -245,6 +245,6 @@ $(document).ready( function(){
         addEventHandlers();
         resetState();
         getUserId();
-		loadAudio('fluffer.wav'); // made to unlock audio on Iphone 5/6
+		loadAudio('songs/fluffer.wav'); // made to unlock audio on Iphone 5/6
     }
 });
