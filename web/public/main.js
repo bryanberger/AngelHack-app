@@ -116,7 +116,7 @@ function dancePartyTime() {
     
     socket.on('party ended', function(data) {
         console.log('a party just ended');
-        $('.dance-img').remove();
+        $('.dance-img').empty();
         ctxSource.noteOff(0);
         resetState();
 
