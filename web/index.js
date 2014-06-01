@@ -92,24 +92,22 @@ function finishParty(socket, partyId){
     updateDB();
 }
 
-function addToParty(pid, uid, socket){
-    console.log('User ' + uid + ' wants to join ' + pid);
-    if ( typeof flatDB.activeParty !== 'undefined' &&
-         flatDB.activeParty.id == pid &&
-         flatDB.activeParty.userList.indexOf(uid) === -1 ) {
-        console.log('User ' + uid + ' added to ' + pid);
-        flatDB.activeParty.userList.push(uid);
+function addToParty(data, socket){
+    if ( typeof flatDB.activeParty !== 'undefined'
+	   && flatDB.activeParty.id == data.partyId
+	   && flatDB.activeParty.userList.indexOf(data.userId) === -1 ) {
+        flatDB.activeParty.userList.push(data.userId);
         updateDB();
         socket.emit('party accepted', JSON.stringify({
-            userId: uid,
-            partyId: flatDB.activeParty.id,
+            userId: data.userId,
+			partyId: flatDB.activeParty.id,
 			timeLeft: flatDB.activeParty.startDate - Date.now(),
 			songId: flatDB.activeParty.songId,
-			songTitle: data.songTitle,
-			songPath: songFiles[data.songId],
+			songTitle: flatDB.activeParty.songTitle,
+			songPath: songFiles[flatDB.activeParty.songId],
 			partyName: flatDB.activeParty.partyName,
 			partyDescription: flatDB.activeParty.partyDescription
-        }));
+        }));		
         return true;
     }
 }
@@ -145,8 +143,8 @@ function createNewParty(data, socket){
 		partyId: flatDB.activeParty.id,
 		timeLeft: flatDB.activeParty.startDate - Date.now(),
 		songId: flatDB.activeParty.songId,
-		songTitle: data.songTitle,
-		songPath: songFiles[data.songId],
+		songTitle: flatDB.activeParty.songTitle,
+		songPath: songFiles[flatDB.activeParty.songId],
 		partyName: flatDB.activeParty.partyName,
 		partyDescription: flatDB.activeParty.partyDescription
     }));
@@ -177,7 +175,7 @@ io.on('connection', function(socket) {
     socket.on('join party', function(Data){
         var dataObj = JSON.parse(Data);
         console.log('User wants to join party ' + dataObj.userId + ' : ' + dataObj.partyId);
-        if ( addToParty(dataObj.partyId, dataObj.userId, socket) ){
+        if ( addToParty(dataObj, socket) ){
             console.log('User ' + dataObj.userId + ' added to party ' + dataObj.partyId);
         } else {
             console.log('User ' + dataObj.userId + ' could not be added to party ' + dataObj.partyId);

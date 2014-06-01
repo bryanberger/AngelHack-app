@@ -86,7 +86,7 @@ function prepDanceParty(data){
 			// Update our dance off text
 			$('div.partyName').text('Party name: ' + data.partyName);
 			$('div.genre').text('Song title: ' + data.songTitle);
-			$('div.partyDescription').text('Party Description: ' + data.partyDescription);
+			$('div.partyDesc').text('Party Description: ' + data.partyDescription);
 			$('div.timerUpdate').text('Party starts in ' + Math.ceil((startDate - Date.now())/1000) + ' seconds.....');
             setTimeout(callback, 10);
         }
