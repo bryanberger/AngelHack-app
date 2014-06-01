@@ -100,7 +100,8 @@ ul {
     list-style: none;
 }
 
-.party-list {
+.party-list,
+#createForm {
     padding: 21px 21px 0 21px;
 }
 
@@ -122,7 +123,7 @@ ul {
     padding: 1.75em 0;
     font-size: 1em;
 }
-
+    
 .btnStartParty {
     text-align: center;
     width: 146px;
@@ -212,6 +213,7 @@ ul {
 }
 
 
+
 .fill {
     width: 100%;
 }
@@ -229,6 +231,13 @@ dl, dd, dt {
 }
 
 
+dd {
+    margin-bottom: 2em;
+}
+
+textarea {
+    width: 100%;
+}
 
 /* ==========================================================================
    Helper classes
