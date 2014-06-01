@@ -151,11 +151,16 @@ function joinButtonClick(){
 function backButtonClick(){
 	if ( danceOffNow === true ) {
 		console.log('leaving the party early');
-		danceOver();		
+		danceOver();
 	} else { 
 		console.log('canceled any chance of a party');
 		clearInterval(partyTimerId); // if this is set
 	}
+        var dataBuffer = {
+            userId: id,
+            partyId: currentPartyId
+        };
+        socket.emit('leave party', JSON.stringify(dataBuffer));
 }
 
 // Force start the party
@@ -216,7 +221,7 @@ function dancePartyTime() {
     });
     
     socket.on('party ended', function(data) {
-		if ( data.partyId === currentPartyId && danceOffNow == true ) {
+		if ( data.partyId === currentPartyId ) {
 			console.log('a party just ended');
 			danceOver();
 		}
