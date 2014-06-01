@@ -101,7 +101,8 @@ ul {
 }
 
 .party-list,
-#createForm {
+#createForm,
+.page-wrap {
     padding: 21px 21px 0 21px;
 }
 

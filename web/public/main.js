@@ -70,7 +70,7 @@ function danceOff(data){
     ctxSource.connect(context.destination);   // connect the source to the context's destination (the speakers)
     ctxSource.noteOn(0);                           // play the source now
                                              
-    $("body").prepend('<img src="http://media2.giphy.com/media/kgKrO1A3JbWTK/giphy.gif" />');
+    $(".dance-img").prepend('<img src="http://media2.giphy.com/media/kgKrO1A3JbWTK/giphy.gif" />');
 }
 
 // Reset our current state
@@ -116,9 +116,11 @@ function dancePartyTime() {
     
     socket.on('party ended', function(data) {
         console.log('a party just ended');
-        $('body img:first').remove();
+        $('.dance-img').remove();
         ctxSource.noteOff(0);
         resetState();
+
+        // transition to home page, remove item from party-list
     });
 }
  
@@ -144,11 +146,15 @@ function getId(){
  
 // Iphone 5/6 unlock audio
 function unlockAudio(){
-    ctxSource = context.createBufferSource(); // creates a sound source
-    ctxSource.buffer = soundBuffer;           // tell the source which sound to play
-    ctxSource.connect(context.destination);   // connect the source to the context's destination (the speakers)
-	ctxSource.noteOn(0);
-	ctxSource.noteOff(0);
+    try {
+        ctxSource = context.createBufferSource(); // creates a sound source
+        ctxSource.buffer = soundBuffer;           // tell the source which sound to play
+        ctxSource.connect(context.destination);   // connect the source to the context's destination (the speakers)
+    	ctxSource.noteOn(0);
+    	ctxSource.noteOff(0);
+    } catch(e) {
+        console.log(e);
+    }
 }
  
 function loadAudio(url) {
