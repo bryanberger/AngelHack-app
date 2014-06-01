@@ -1,0 +1,13 @@
+{
+  "name": "CrowdBox",
+  "version": "0.0.0",
+  "description": "CrowdBox is a crowd sourced flashmob boombox",
+  "main": "index.js",
+  "author": "Bryan Berger & Luke Arnston",
+  "private": true,
+  "license": "BSD",
+  "dependencies": {
+    "express": "3.4.8",
+    "socket.io": "~1.0.2"
+  }
+}
