@@ -52,8 +52,11 @@ function prepDanceParty(data){
     var callback = function(){
         if ( Date.now() >= startDate ) {
             // Fucking dance off
+			$('div.timerUpdate').text('');
             danceOff(data);
         } else {
+			// Update our dance off text
+			$('div.timerUpdate').text('Party starts in ' + Math.ceil((startDate - Date.now())/1000) + ' seconds.....');
             setTimeout(callback, 10);
         }
     };
@@ -84,6 +87,7 @@ function joinButtonClick(){
 		if ( partyReady === true ) {
 			joinDanceParty(newPartyId);
 		} else {
+			$('div.timerUpdate').text('Waiting for party....');
 			setTimeout(callback, 250);
 		}
 	};
