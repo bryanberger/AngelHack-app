@@ -118,9 +118,7 @@ function danceOver(){
 	// leave party
 	$('.dance-img img').remove();
 	ctxSource.noteOff(0);
-	resetState();
-	// transition to home page, remove item from party-list
-	PageTransitions.animate($('#goHome'));
+	resetState();	
 }
 
 // Reset our current state
@@ -128,6 +126,8 @@ function resetState(){
 	partyReady = false;
 	danceOffNow = false;
 	songReady = false;
+
+	PageTransitions.animate($('#goHome'));
 	$('ul.party-list').hide(); // hide our list of items
 }
 
