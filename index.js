@@ -4,7 +4,7 @@ var app = require('express')();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var fs = require('fs');
-var port = 3000;
+var port = process.env.PORT || 3000;
 
 // Local variables
 var flatDB;
