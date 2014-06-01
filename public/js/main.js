@@ -137,6 +137,7 @@ function resetState(){
 	PageTransitions.animate($('#goHome'));
 	$('ul.party-list').hide(); // hide our list of items
     $('div.startParty').hide(); // hide the force party start button
+    $('div.partyCnt').text('');
 }
 
 // Button events
@@ -195,6 +196,9 @@ function dancePartyTime() {
 				$('p.list-item-time').text('starts in ' + Math.ceil(data.timeLeft/1000.0) + ' seconds!');
 			}
 			$('ul.party-list').show(); // make sure we are visible
+        }
+        if ( data.partyId === currentPartyId ) {
+            $('div.partyCnt').text(data.userCnt + ' party rockers!');
         }
     });
     
