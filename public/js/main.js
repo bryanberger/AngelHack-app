@@ -70,6 +70,9 @@ function startDanceParty(){
 function setPartyStarting(data){
     currentPartyId = data.partyId;
 	loadAudio(data.songPath,function(){songReady=true;}); // load the song
+    if ( typeof data.owner !== 'undefined' && data.owner === true ) {
+        $('div.startParty').show();
+    }
     prepDanceParty(data);
 }
 
@@ -101,8 +104,6 @@ function prepDanceParty(data){
                 $('div.timerUpdate').text('0');
             }
 			$('.secs').text('seconds until party...');
-
-            
         }
     };
     partyTimerId = setInterval(callback, 10);
@@ -134,6 +135,7 @@ function resetState(){
 
 	PageTransitions.animate($('#goHome'));
 	$('ul.party-list').hide(); // hide our list of items
+    $('div.startParty').hide(); // hide the force party start button
 }
 
 // Button events
@@ -154,6 +156,16 @@ function backButtonClick(){
 		console.log('canceled any chance of a party');
 		clearInterval(partyTimerId); // if this is set
 	}
+}
+
+// Force start the party
+function forceButtonClick(){
+    var dataBuffer = {
+        userId: id,
+        partyId: currentPartyId
+    };
+    socket.emit('forcestart party', JSON.stringify(dataBuffer));
+    $('div.startParty').hide();
 }
 
 function dancePartyTime() {    
@@ -185,6 +197,24 @@ function dancePartyTime() {
         }
     });
     
+    socket.on('party forcestart', function(data) {
+        console.log('a party creator wants to force start a party');
+        var dataObj = JSON.parse(data);
+        if ( dataObj.partyId === currentPartyId ) {
+            // Frakking dance off
+            clearInterval(partyTimerId);
+			$('div.timerUpdate').text('');
+			$('.secs').text('');
+            var callback = function() {
+                if ( songReady === true )
+                    danceOff(dataObj);
+                else
+                    setTimeout(callback, 10);
+            };
+            callback();
+        }
+    });
+    
     socket.on('party ended', function(data) {
 		if ( data.partyId === currentPartyId && danceOffNow == true ) {
 			console.log('a party just ended');
@@ -198,6 +228,7 @@ function addEventHandlers(){
     $('.btnCreate').click(partyButtonClick);
 	$('.btnJoin').click(joinButtonClick);
 	$('.btnBack').click(backButtonClick);
+    $('div.startParty').click(forceButtonClick);
 }
 
 function getUserId(){

@@ -9,7 +9,7 @@ var port = process.env.PORT || 3000;
 // Local variables
 var flatDB;
 var flatDBName = 'db.json';
-var startTimer = 30*1000; // 30 seconds until a dance starts
+var startTimer = 120*1000; // 30 seconds until a dance starts
 var danceTime = 30*1000; // dance parties are 30 seconds long
 var endTimer = startTimer + danceTime; // 20 second dance parties
 var songFiles = {
@@ -18,6 +18,7 @@ var songFiles = {
 	'house':'songs/dancesong3.mp3',
 	'pop':'songs/dancesong4.mp3'
 };
+var startTimerId;
 
 var guid = (function() {
   function s4() {
@@ -107,8 +108,8 @@ function finishParty(socket, partyId){
 }
 
 function sendPartyAccepted(data, socket){
-	socket.emit('party accepted', JSON.stringify({
-		userId: data.userId,
+    var dataPacket = {
+        userId: data.userId,
 		partyId: flatDB.activeParty.id,
 		timeLeft: flatDB.activeParty.startDate - Date.now(),
         startDate: flatDB.activeParty.startDate,
@@ -117,7 +118,22 @@ function sendPartyAccepted(data, socket){
 		songPath: songFiles[flatDB.activeParty.songId],
 		partyName: flatDB.activeParty.partyName,
 		partyDescription: flatDB.activeParty.partyDescription
-    }));
+    };
+    if ( data.userId === flatDB.activeParty.userInitiated ) {
+        dataPacket['owner'] = true;
+    }
+    socket.emit('party accepted', JSON.stringify(dataPacket));
+}
+
+function sendForceStart(data, socket){
+    var dataPacket = {
+        userId: data.userId,
+		partyId: flatDB.activeParty.id,
+		timeLeft: flatDB.activeParty.startDate - Date.now(),
+        startDate: flatDB.activeParty.startDate
+    };
+    socket.emit('party forcestart', JSON.stringify(dataPacket));
+    socket.broadcast.emit('party forcestart', JSON.stringify(dataPacket));
 }
 
 function addToParty(data, socket){
@@ -131,6 +147,20 @@ function addToParty(data, socket){
         return true;
     }
 }
+
+function forcestartParty(data, socket){
+    if ( typeof flatDB.activeParty !== 'undefined'
+        && flatDB.activeParty.id === data.partyId
+        && flatDB.activeParty.userInitiated === data.userId ) {
+        // Set the start date and end date
+        flatDB.activeParty.startDate = Date.now();
+        flatDB.activeParty.endDate = flatDB.activeParty.startDate + danceTime;
+        sendForceStart(data, socket);
+        return true;
+    } else {
+        return false;
+    }
+};
 
 function createNewParty(data, socket){
     // check to see if this user is currently in an active party
@@ -190,6 +220,16 @@ io.on('connection', function(socket) {
             console.log('User ' + dataObj.userId + ' added to party ' + dataObj.partyId);
         } else {
             console.log('User ' + dataObj.userId + ' could not be added to party ' + dataObj.partyId);
+        }
+    });
+
+    socket.on('forcestart party', function(Data){
+        var dataObj = JSON.parse(Data);
+        console.log('User wants to forcestart party ' + dataObj.userId + ' : ' + dataObj.partyId);
+        if ( forcestartParty(dataObj, socket) ){
+            console.log('User ' + dataObj.userId + ' force started the party ' + dataObj.partyId);
+        } else {
+            console.log('User ' + dataObj.userId + ' could not force start the party ' + dataObj.partyId);
         }
     });
 });
