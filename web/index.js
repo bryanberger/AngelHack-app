@@ -10,7 +10,7 @@ var port = 3000;
 var flatDB;
 var flatDBName = 'db.json';
 var startTimer = 5000; // 5 seconds until a dance starts
-var danceTime = 30000;
+var danceTime = 10000;
 var endTimer = startTimer + danceTime; // 20 second dance parties
 
 var guid = (function() {
@@ -78,7 +78,6 @@ function finishParty(socket, partyId){
     console.log('Ending the party ' + flatDB.activeParty.id + ', archiving');
     // Save our database, archive the current party
     flatDB.archive[flatDB.activeParty.id.toString()] = flatDB.activeParty;
-    updateDB();
     socket.emit('party ended', {partyId: flatDB.activeParty.id});
     socket.broadcast.emit('party ended', {partyId: flatDB.activeParty.id});
     flatDB.activeParty = undefined;

@@ -28,6 +28,7 @@ function startDanceParty(){
     console.log('starting dance party');
     var dataBuffer = {userId: id};
     socket.emit('new party', JSON.stringify(dataBuffer));
+	unlockAudio();
     return false;
 }
 
@@ -36,14 +37,13 @@ function setPartyStarting(data){
     $('#danceParty').val('Party Starting...');
     $('#danceParty').attr('disabled','disabled');
     prepDanceParty(data);
-    ctxSource = context.createBufferSource(); // creates a sound source
-    ctxSource.buffer = soundBuffer;                    // tell the source which sound to play
-    ctxSource.connect(context.destination);       // connect the source to the context's destination (the speakers)
+
 }
 
 function joinDanceParty(pid){
     // Clients don't care if they fail
     socket.emit('join party', JSON.stringify({userId: id, partyId: pid}));
+	unlockAudio();
 }
 
 function prepDanceParty(data){
@@ -62,7 +62,10 @@ function prepDanceParty(data){
 
 // Dance off NOW!
 function danceOff(data){
-    ctxSource.start(0);                           // play the source now
+	ctxSource = context.createBufferSource(); // creates a sound source
+    ctxSource.buffer = soundBuffer;           // tell the source which sound to play
+    ctxSource.connect(context.destination);   // connect the source to the context's destination (the speakers)
+    ctxSource.noteOn(0);                           // play the source now
                                              
     $('#danceParty').val('DANCE PARTY');
     $("body").prepend('<img src="http://media2.giphy.com/media/kgKrO1A3JbWTK/giphy.gif" />');
@@ -97,7 +100,7 @@ function dancePartyTime() {
     socket.on('party ended', function(data) {
         console.log('a party just ended');
         $('body img:first').remove();
-        ctxSource.stop(0);
+        ctxSource.noteOff(0);
         resetState();
     });
 }
@@ -123,7 +126,11 @@ function getId(){
  
 // Iphone 5/6 unlock audio
 function unlockAudio(){
-noteOn
+    ctxSource = context.createBufferSource(); // creates a sound source
+    ctxSource.buffer = soundBuffer;           // tell the source which sound to play
+    ctxSource.connect(context.destination);   // connect the source to the context's destination (the speakers)
+	ctxSource.noteOn(0);
+	ctxSource.noteOff(0);
 }
  
 function loadAudio(url) {
